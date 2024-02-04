@@ -29,6 +29,15 @@ class HomePage extends StatelessWidget {
       'image': imageUrl,
       'timestamp': Timestamp.now(),
     });
+    // Fluttertoast.showToast(
+    //   msg: "$productName has been added to your cart!",
+    //   toastLength: Toast.LENGTH_SHORT,
+    //   gravity: ToastGravity.BOTTOM,
+    //   timeInSecForIosWeb: 1,
+    //   backgroundColor: Colors.green,
+    //   textColor: Colors.white,
+    //   fontSize: 16.0,
+    // );
   }
 
   @override

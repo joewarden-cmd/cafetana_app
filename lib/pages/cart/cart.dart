@@ -11,7 +11,6 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
-
   final CartService cartService = CartService();
   final String userId = FirebaseAuth.instance.currentUser!.uid;
 
@@ -22,7 +21,7 @@ class _CartPageState extends State<CartPage> {
 
   Future<Map<String, dynamic>> calculateTotal() async {
     double total = 0.0;
-    Map<String, int> productCounts = {};  // To store product count
+    Map<String, int> productCounts = {}; // To store product count
     QuerySnapshot snapshot = await cartService.getCartStream(userId).first;
     List productList = snapshot.docs;
 
@@ -46,6 +45,7 @@ class _CartPageState extends State<CartPage> {
       'productCounts': productCounts,
     };
   }
+
   void openCheckoutBox() async {
     // Get total and product counts
     Map<String, dynamic> result = await calculateTotal();
@@ -88,49 +88,86 @@ class _CartPageState extends State<CartPage> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Cart")),
+      appBar: AppBar(title: const Text("Cart")),
       body: Column(
         children: [
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: cartService.getCartStream(userId),
               builder: (context, snapshot) {
-                if(snapshot.hasData) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return const Center(child: Text("Something went wrong"));
+                } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return const Center(child: Text("Your cart is empty"));
+                } else {
                   List productList = snapshot.data!.docs;
-            
                   return ListView.builder(
                     itemCount: productList.length,
                     itemBuilder: (context, index) {
                       DocumentSnapshot document = productList[index];
                       String docID = document.id;
-            
-                      Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+
+                      Map<String, dynamic> data =
+                          document.data() as Map<String, dynamic>;
                       String productText = data['product'];
                       String priceText = data['price'];
                       String productImg = data['image'];
-            
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: NetworkImage(productImg),
+
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 16),
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        title: Text(productText),
-                        subtitle: Text("₱$priceText"),
-                        trailing: IconButton(
-                          onPressed: () {
-                            removeFromCart(docID);
-                          },
-                          icon: const Icon(Icons.remove_shopping_cart),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: NetworkImage(productImg),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      productText,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text("₱$priceText"),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  removeFromCart(docID);
+                                },
+                                icon: const Icon(Icons.remove_shopping_cart),
+                                color: Colors.red,
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },
                   );
-                } else {
-                  return const Center(child: Text("No data"));
                 }
               },
             ),
