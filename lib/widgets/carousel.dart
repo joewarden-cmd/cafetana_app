@@ -4,21 +4,19 @@ import 'package:carousel_slider/carousel_slider.dart';
 class ImageCarousel extends StatelessWidget {
   final List<String> imageUrls;
 
-  ImageCarousel({required this.imageUrls});
+  const ImageCarousel({super.key, required this.imageUrls});
 
   @override
   Widget build(BuildContext context) {
-    // Get the screen width and height
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    // Calculate dynamic width and height based on the screen size
-    double carouselHeight = screenHeight * 0.15; // 15% of the screen height
-    double carouselWidth = screenWidth * 0.9; // 90% of the screen width
+    double carouselHeight = screenHeight * 0.20;
+    double carouselWidth = screenWidth * 0.9;
 
     return Padding(
       padding: const EdgeInsets.all(4.0),
-      child: Container(
+      child: SizedBox(
         height: carouselHeight,
         width: carouselWidth,
         child: ClipRRect(
@@ -27,15 +25,38 @@ class ImageCarousel extends StatelessWidget {
             itemCount: imageUrls.length,
             options: CarouselOptions(
               autoPlay: true,
-              aspectRatio: screenWidth > 600 ? 2.0 : 1.5, // Adjust aspect ratio for different screen sizes
-              enlargeCenterPage: true,
+              aspectRatio: screenWidth > 600 ? 2.0 : 1.5,
+              enlargeCenterPage: false,
+              viewportFraction: 1.0,
             ),
             itemBuilder: (context, index, realIndex) {
-              return Image.network(
-                imageUrls[index],
-                fit: BoxFit.cover,
-                width: carouselWidth,
-                height: carouselHeight,
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.network(
+                    imageUrls[index],
+                    fit: BoxFit.cover,
+                    width: carouselWidth,
+                    height: carouselHeight,
+                  ),
+                  Positioned(
+                    bottom: 20,
+                    left: 20,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
+                      color: Colors.black.withOpacity(0.5),
+                      child: const Text(
+                        'Popular',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               );
             },
           ),

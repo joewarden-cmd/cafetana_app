@@ -4,38 +4,46 @@ class AllProductService {
   final CollectionReference allProducts =
   FirebaseFirestore.instance.collection("product2");
 
-  Stream<QuerySnapshot> getAllProductStream() {
-    final allProductStream = allProducts
+  Stream<List<DocumentSnapshot>> getAllProductStream() async* {
+    QuerySnapshot snapshot = await allProducts.get();
+    List<DocumentSnapshot> shuffledProducts = List.from(snapshot.docs)..shuffle();
+
+    yield shuffledProducts.take(10).toList();
+  }
+}
+
+
+
+class ProductImageService {
+  final CollectionReference allProductsImage =
+  FirebaseFirestore.instance.collection("product2");
+
+  Stream<List<String>> getAllProductImageUrlsStream() {
+    return allProductsImage
         .orderBy("createdAt", descending: true)
         .limit(10)
-        .snapshots();
-
-    return allProductStream;
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.docs
+          .map((doc) => doc['imageUrl'] as String)
+          .toList();
+    });
   }
 }
 
-class FoodService {
-  final CollectionReference foods =
-      FirebaseFirestore.instance.collection("product2");
 
-  // Future<void> addProduct(String food, String price, String image) {
-  //   return foods.add({
-  //     'food': food,
-  //     'price' : price,
-  //     'image' : image,
-  //     'timestamp': Timestamp.now(),
-  //   });
-  // }
+class FilterService {
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  Stream<QuerySnapshot> getFoodStream() {
-    final foodStream = foods
-        .where("category", isEqualTo: "Foods")
-        // .orderBy("createdAt", descending: true)
+  // Add category parameter to filter the products
+  Stream<QuerySnapshot> getFoodStream({required String category}) {
+    return firestore
+        .collection('product2') // Assuming your collection is named 'products'
+        .where('category', isEqualTo: category) // Filter by category
         .snapshots();
-
-    return foodStream;
   }
 }
+
 
 class DrinkService {
   final CollectionReference drinks =

@@ -67,7 +67,7 @@ class _CartPageState extends State<CartPage> {
           children: [
             Text("Products in your cart:\n$productListString"),
             const SizedBox(height: 10),
-            Text("Total Price: \$${totalPrice.toStringAsFixed(2)}"),
+            Text("Total Price: ₱${totalPrice.toStringAsFixed(2)}"),
           ],
         ),
         actions: [
@@ -119,7 +119,7 @@ class _CartPageState extends State<CartPage> {
                           backgroundImage: NetworkImage(productImg),
                         ),
                         title: Text(productText),
-                        subtitle: Text("\$$priceText"),
+                        subtitle: Text("₱$priceText"),
                         trailing: IconButton(
                           onPressed: () {
                             removeFromCart(docID);
