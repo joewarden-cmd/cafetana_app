@@ -19,19 +19,72 @@ class _MyFilterState extends State<FilterList> {
 
   String get category => widget.category;
 
-  void addToCart(String productName, String priceText, String imageUrl) async {
+  void addToCart(BuildContext context, String productName, String priceText,
+      String imageUrl) async {
     var userDocRef =
         FirebaseFirestore.instance.collection('users').doc(user.uid);
 
-    int quantity = 1;
+    try {
+      var cartSnapshot = await userDocRef
+          .collection('cart')
+          .where('product', isEqualTo: productName)
+          .get();
 
-    await userDocRef.collection('cart').add({
-      'product': productName,
-      'price': priceText,
-      'quantity': quantity,
-      'image': imageUrl,
-      'timestamp': Timestamp.now(),
-    });
+      if (cartSnapshot.docs.isEmpty) {
+        await userDocRef.collection('cart').add({
+          'product': productName,
+          'price': priceText,
+          'quantity': 1,
+          'image': imageUrl,
+          'timestamp': Timestamp.now(),
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "$productName has been added to your cart!",
+              style: TextStyle(color: Colors.white, fontSize: 16.0),
+            ),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.only(bottom: 80.0),
+          ),
+        );
+      } else {
+        var cartItem = cartSnapshot.docs.first;
+        int currentQuantity = cartItem['quantity'];
+        await cartItem.reference.update({
+          'quantity': currentQuantity + 1,
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Quantity of $productName has been increased!",
+              style: TextStyle(color: Colors.white, fontSize: 16.0),
+            ),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.only(bottom: 80.0),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Failed to add $productName to cart. Please try again.",
+            style: TextStyle(color: Colors.white, fontSize: 16.0),
+          ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.only(bottom: 80.0),
+        ),
+      );
+    }
   }
 
   @override
@@ -93,7 +146,7 @@ class _MyFilterState extends State<FilterList> {
                       subtitle: Text("₱$priceText"),
                       trailing: IconButton(
                         onPressed: () {
-                          addToCart(productText, priceText, imageUrl);
+                          addToCart(context, productText, priceText, imageUrl);
                         },
                         icon: const Icon(Icons.shopping_cart),
                       ),

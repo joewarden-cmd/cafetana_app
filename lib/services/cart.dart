@@ -25,24 +25,32 @@ class CartService {
   }
 
   Future<void> clearCart(String userId) async {
-    // Get references to "cart" and "orders" collections
-    final cartReference = products.doc(userId).collection("cart");
+    final cartReference = FirebaseFirestore.instance.collection('users').doc(userId).collection("cart");
     final orderReference = FirebaseFirestore.instance.collection("orders");
 
-    // Get all documents from the "cart" collection
     final QuerySnapshot cartSnapshot = await cartReference.get();
 
-    // Delete each document in the "cart" collection
+    DocumentReference orderDocRef = await orderReference.add({
+      'userId': userId,
+      'deleteTimestamp': FieldValue.serverTimestamp(),
+      'status': 'Pending',
+    });
+
     for (QueryDocumentSnapshot doc in cartSnapshot.docs) {
-      // Store the deleted item in the "orders" collection
-      await orderReference.add({
-        'userId': userId,
+      Map<String, dynamic> cartData = doc.data() as Map<String, dynamic>;
+
+      await orderDocRef.collection('items').add({
         'productId': doc.id,
+        'productData': cartData,
         'deleteTimestamp': FieldValue.serverTimestamp(),
       });
 
-      // Delete the item from the "cart" collection
-      await cartReference.doc(doc.id).delete();
     }
+    await cartReference.get().then((cartSnapshot) async {
+      for (QueryDocumentSnapshot doc in cartSnapshot.docs) {
+        await doc.reference.delete();
+      }
+    });
   }
+
 }

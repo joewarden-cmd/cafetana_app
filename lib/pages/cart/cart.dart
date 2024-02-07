@@ -14,14 +14,42 @@ class _CartPageState extends State<CartPage> {
   final CartService cartService = CartService();
   final String userId = FirebaseAuth.instance.currentUser!.uid;
 
-  Future<void> removeFromCart(String productId) async {
-    // Implement the logic to remove the product from the cart
-    // You might use cartService.removeProduct(productId);
+  Future<void> removeFromCart(
+      context, String productName, String productId) async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          "$productName has been removed.",
+          style: TextStyle(color: Colors.white, fontSize: 16.0),
+        ),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.only(bottom: 80.0),
+      ),
+    );
+    final cartReference = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('cart');
+    await cartReference.doc(productId).delete();
+  }
+
+  Future<void> incrementQuantity(String productId, int currentQuantity) async {
+    final cartReference = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('cart')
+        .doc(productId);
+
+    await cartReference.update({
+      'quantity': currentQuantity + 1,
+    });
   }
 
   Future<Map<String, dynamic>> calculateTotal() async {
     double total = 0.0;
-    Map<String, int> productCounts = {}; // To store product count
+    Map<String, int> productCounts = {};
     QuerySnapshot snapshot = await cartService.getCartStream(userId).first;
     List productList = snapshot.docs;
 
@@ -30,9 +58,8 @@ class _CartPageState extends State<CartPage> {
       String productName = data['product'];
       double price = double.tryParse(data['price'].toString()) ?? 0.0;
 
-      total += price;
+      total += price * data['quantity'];
 
-      // Increment the count for the product
       if (productCounts.containsKey(productName)) {
         productCounts[productName] = productCounts[productName]! + 1;
       } else {
@@ -47,12 +74,10 @@ class _CartPageState extends State<CartPage> {
   }
 
   void openCheckoutBox() async {
-    // Get total and product counts
     Map<String, dynamic> result = await calculateTotal();
     double totalPrice = result['total'];
     Map<String, int> productCounts = result['productCounts'];
 
-    // Build the product list string
     String productListString = "";
     productCounts.forEach((product, count) {
       productListString += "$product x$count\n";
@@ -74,10 +99,21 @@ class _CartPageState extends State<CartPage> {
           Center(
             child: ElevatedButton(
               onPressed: () {
-                // Call a method to delete everything from the cart
                 cartService.clearCart(userId);
 
-                // Close the dialog after confirming the order
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      "Order has been placed..",
+                      style: TextStyle(color: Colors.white, fontSize: 16.0),
+                    ),
+                    backgroundColor: Colors.green,
+                    duration: Duration(seconds: 3),
+                    behavior: SnackBarBehavior.floating,
+                    margin: EdgeInsets.only(bottom: 80.0),
+                  ),
+                );
+
                 Navigator.of(context).pop();
               },
               child: const Text("Confirm Order"),
@@ -117,6 +153,7 @@ class _CartPageState extends State<CartPage> {
                       String productText = data['product'];
                       String priceText = data['price'];
                       String productImg = data['image'];
+                      int quantity = data['quantity'];
 
                       return Card(
                         margin: const EdgeInsets.symmetric(
@@ -152,15 +189,29 @@ class _CartPageState extends State<CartPage> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text("₱$priceText"),
+                                    Text("Quantity: $quantity"),
                                   ],
                                 ),
                               ),
-                              IconButton(
-                                onPressed: () {
-                                  removeFromCart(docID);
-                                },
-                                icon: const Icon(Icons.remove_shopping_cart),
-                                color: Colors.red,
+                              Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      incrementQuantity(docID, quantity);
+                                    },
+                                    icon: const Icon(Icons.add),
+                                    color: Colors.green,
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      removeFromCart(
+                                          context, productText, docID);
+                                    },
+                                    icon:
+                                        const Icon(Icons.remove_shopping_cart),
+                                    color: Colors.red,
+                                  ),
+                                ],
                               ),
                             ],
                           ),
