@@ -51,7 +51,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: const Text('Profile'),
       ),
       body: Padding(
@@ -62,8 +63,15 @@ class _ProfilePageState extends State<ProfilePage> {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 20),
               decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(10),
+                gradient: LinearGradient(
+                  colors: [Colors.blue, Colors.green],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(100),
+                  bottomRight: Radius.circular(100),
+                ),
               ),
               child: Column(
                 children: [
@@ -124,16 +132,22 @@ class _ProfilePageState extends State<ProfilePage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
+                backgroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                elevation: 0,
               ),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.edit, color: Colors.white),
+                  Icon(Icons.edit),
                   SizedBox(width: 8),
                   Text(
                     'Edit Profile',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    style: TextStyle(fontSize: 18),
                   ),
+                  Spacer(),
+                  Icon(Icons.arrow_forward),
                 ],
               ),
             ),
@@ -149,16 +163,22 @@ class _ProfilePageState extends State<ProfilePage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
+                backgroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                elevation: 0,
               ),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.edit, color: Colors.white),
+                  Icon(Icons.shopping_bag),
                   SizedBox(width: 8),
                   Text(
                     'View Orders',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    style: TextStyle(fontSize: 18),
                   ),
+                  Spacer(),
+                  Icon(Icons.arrow_forward),
                 ],
               ),
             ),
@@ -171,16 +191,22 @@ class _ProfilePageState extends State<ProfilePage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
+                backgroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                elevation: 0,
               ),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.logout, color: Colors.white),
+                  Icon(Icons.logout),
                   SizedBox(width: 8),
                   Text(
                     'Logout',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    style: TextStyle(fontSize: 18),
                   ),
+                  Spacer(), // Push the arrow to the right
+                  Icon(Icons.arrow_forward),
                 ],
               ),
             ),
