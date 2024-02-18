@@ -40,7 +40,9 @@ class _SignPageState extends State<SignUpPage> {
           password: passController.text,
         );
 
-        var userDocRef = FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid);
+        var userDocRef = FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user!.uid);
 
         await userDocRef.collection('info').doc("data").set({
           'name': nameController.text,
@@ -163,6 +165,10 @@ class _SignPageState extends State<SignUpPage> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.lightGreen,
+                    ),
                     onPressed: () {
                       processSignUp();
                     },
