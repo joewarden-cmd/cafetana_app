@@ -35,6 +35,20 @@ class _CartPageState extends State<CartPage> {
     await cartReference.doc(productId).delete();
   }
 
+  Future<void> decrementQuantity(String productId, int currentQuantity) async {
+    if (currentQuantity > 1) {
+      final cartReference = FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('cart')
+          .doc(productId);
+
+      await cartReference.update({
+        'quantity': currentQuantity - 1,
+      });
+    }
+  }
+
   Future<void> incrementQuantity(String productId, int currentQuantity) async {
     final cartReference = FirebaseFirestore.instance
         .collection('users')
@@ -55,15 +69,18 @@ class _CartPageState extends State<CartPage> {
 
     for (var document in productList) {
       Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-      String productName = data['product'];
       double price = double.tryParse(data['price'].toString()) ?? 0.0;
+      String productName = data['product'];
+      int quantity = data['quantity'] is num
+          ? (data['quantity'] as num).toInt()
+          : data['quantity'];
 
-      total += price * data['quantity'];
+      total += price * quantity;
 
       if (productCounts.containsKey(productName)) {
-        productCounts[productName] = productCounts[productName]! + 1;
+        productCounts[productName] = productCounts[productName]! + quantity;
       } else {
-        productCounts[productName] = 1;
+        productCounts[productName] = quantity;
       }
     }
 
@@ -86,17 +103,25 @@ class _CartPageState extends State<CartPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        title: const Text("Products in your cart."),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Products in your cart:\n$productListString"),
-            const SizedBox(height: 10),
-            Text("Total Price: ₱${totalPrice.toStringAsFixed(2)}"),
+            Text(productListString),
+            Divider(),
+            Text(
+              "Total Price: ₱${totalPrice.toStringAsFixed(2)}",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.lightGreen,
+              ),
+            ),
           ],
         ),
         actions: [
-          Center(
+          SizedBox(
+            width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
                 cartService.clearCart(userId);
@@ -118,7 +143,7 @@ class _CartPageState extends State<CartPage> {
               },
               child: const Text("Confirm Order"),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -149,7 +174,7 @@ class _CartPageState extends State<CartPage> {
                       String docID = document.id;
 
                       Map<String, dynamic> data =
-                          document.data() as Map<String, dynamic>;
+                      document.data() as Map<String, dynamic>;
                       String productText = data['product'];
                       String priceText = data['price'];
                       String productImg = data['image'];
@@ -182,33 +207,71 @@ class _CartPageState extends State<CartPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      productText,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
+                                    Text(productText),
                                     const SizedBox(height: 4),
-                                    Text("₱$priceText"),
-                                    Text("Quantity: $quantity"),
+                                    Text(
+                                      "₱$priceText",
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.lightGreen,
+                                      ),
+                                    )
                                   ],
                                 ),
                               ),
                               Row(
                                 children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      incrementQuantity(docID, quantity);
-                                    },
-                                    icon: const Icon(Icons.add),
-                                    color: Colors.green,
+                                  Container(
+                                    width: 25.0,
+                                    height: 25.0,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.lightGreen,
+                                        width: 2.0,
+                                      ),
+                                    ),
+                                    child: IconButton(
+                                      onPressed: () {
+                                        decrementQuantity(docID, quantity);
+                                      },
+                                      icon: const Icon(Icons.remove),
+                                      color: Colors.lightGreen,
+                                      iconSize: 20.0,
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0),
+                                    child: Text("$quantity"),
+                                  ),
+                                  Container(
+                                    width: 25.0,
+                                    height: 25.0,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.lightGreen,
+                                        width: 2.0,
+                                      ),
+                                    ),
+                                    child: IconButton(
+                                      onPressed: () {
+                                        incrementQuantity(docID, quantity);
+                                      },
+                                      icon: const Icon(Icons.add),
+                                      color: Colors.lightGreen,
+                                      iconSize: 20.0,
+                                      padding: EdgeInsets.zero,
+                                    ),
                                   ),
                                   IconButton(
                                     onPressed: () {
                                       removeFromCart(
                                           context, productText, docID);
                                     },
-                                    icon:
-                                        const Icon(Icons.remove_shopping_cart),
+                                    icon: const Icon(Icons.delete),
                                     color: Colors.red,
                                   ),
                                 ],
@@ -229,6 +292,13 @@ class _CartPageState extends State<CartPage> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.lightGreen,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
+                ),
                 onPressed: () {
                   openCheckoutBox();
                 },
