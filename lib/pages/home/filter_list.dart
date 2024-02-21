@@ -22,7 +22,7 @@ class _MyFilterState extends State<FilterList> {
   void addToCart(BuildContext context, String productName, String priceText,
       String imageUrl) async {
     var userDocRef =
-        FirebaseFirestore.instance.collection('users').doc(user.uid);
+    FirebaseFirestore.instance.collection('users').doc(user.uid);
 
     try {
       var cartSnapshot = await userDocRef
@@ -120,7 +120,7 @@ class _MyFilterState extends State<FilterList> {
               String docID = document.id;
 
               Map<String, dynamic> data =
-                  document.data() as Map<String, dynamic>;
+              document.data() as Map<String, dynamic>;
               String productText = data['productName'];
               String priceText = data['price'];
               String imageUrl = data['imageUrl'];
@@ -137,18 +137,22 @@ class _MyFilterState extends State<FilterList> {
                     ListTile(
                       title: Text(
                         productText,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
-                      subtitle: Text("₱$priceText"),
+                      subtitle: Text(
+                        "₱$priceText",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.lightGreen,
+                        ),
+                      ),
                       trailing: IconButton(
                         onPressed: () {
                           addToCart(context, productText, priceText, imageUrl);
                         },
-                        icon: const Icon(Icons.shopping_cart),
+                        icon: const Icon(Icons.shopping_cart,
+                            color: Colors.lightGreen),
                       ),
                     ),
                   ],

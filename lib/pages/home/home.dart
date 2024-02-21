@@ -20,7 +20,7 @@ class HomePage extends StatelessWidget {
   void addToCart(BuildContext context, String productName, String priceText,
       String imageUrl) async {
     var userDocRef =
-        FirebaseFirestore.instance.collection('users').doc(user.uid);
+    FirebaseFirestore.instance.collection('users').doc(user.uid);
 
     try {
       var cartSnapshot = await userDocRef
@@ -117,7 +117,7 @@ class HomePage extends StatelessWidget {
                 stream: AllCategoryService().getAllCategoryStream(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator(); // Show loading spinner
+                    return const CircularProgressIndicator();
                   }
 
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -126,39 +126,41 @@ class HomePage extends StatelessWidget {
 
                   List<String> categories = snapshot.data!;
 
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: categories.map((category) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: OutlinedButton(
-                          onPressed: () {
-                            String selectedCategory = category;
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    FilterList(category: selectedCategory),
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: categories.map((category) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: OutlinedButton(
+                            onPressed: () {
+                              String selectedCategory = category;
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      FilterList(category: selectedCategory),
+                                ),
+                              );
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.lightGreen,
+                              side: const BorderSide(
+                                  color: Colors.lightGreen, width: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                            );
-                          },
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.green,
-                            side:
-                                const BorderSide(color: Colors.green, width: 2),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              category,
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ),
-                          child: Text(
-                            category,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                        );
+                      }).toList(),
+                    ),
                   );
                 },
               ),
@@ -172,7 +174,7 @@ class HomePage extends StatelessWidget {
                     return GridView.builder(
                       shrinkWrap: true,
                       gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
+                      const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 8.0,
                         mainAxisSpacing: 8.0,
@@ -182,7 +184,7 @@ class HomePage extends StatelessWidget {
                         DocumentSnapshot document = productList[index];
 
                         Map<String, dynamic> data =
-                            document.data() as Map<String, dynamic>;
+                        document.data() as Map<String, dynamic>;
                         String productText = data['productName'];
                         String priceText = data['price'];
                         String imageUrl = data['imageUrl'];
@@ -206,19 +208,23 @@ class HomePage extends StatelessWidget {
                               ListTile(
                                 title: Text(
                                   productText,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                 ),
-                                subtitle: Text("₱$priceText"),
+                                subtitle: Text(
+                                  "₱$priceText",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.lightGreen,
+                                  ),
+                                ),
                                 trailing: IconButton(
                                   onPressed: () {
                                     addToCart(context, productText, priceText,
                                         imageUrl);
                                   },
-                                  icon: const Icon(Icons.shopping_cart),
+                                  icon: const Icon(Icons.shopping_cart,
+                                      color: Colors.lightGreen),
                                 ),
                               ),
                             ],
