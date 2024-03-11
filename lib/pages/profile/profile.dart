@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_food_ordering/pages/profile/edit_password.dart';
 
 import 'edit_profile.dart';
 import 'orders.dart';
@@ -50,11 +51,6 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text('Profile'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(0),
         child: Column(
@@ -64,7 +60,7 @@ class _ProfilePageState extends State<ProfilePage> {
               padding: const EdgeInsets.symmetric(vertical: 20),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.blue, Colors.green],
+                  colors: [Colors.lightGreen, Colors.green],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -81,7 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Icon(
                       Icons.person,
                       size: 50,
-                      color: Colors.blue,
+                      color: Colors.lightGreen,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -124,6 +120,37 @@ class _ProfilePageState extends State<ProfilePage> {
               onPressed: () {
                 Navigator.push(
                   context,
+                  MaterialPageRoute(builder: (context) => const MyOrderPage()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                backgroundColor: Colors.white,
+                padding:
+                const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                elevation: 0,
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.shopping_bag),
+                  SizedBox(width: 8),
+                  Text(
+                    'View Orders',
+                    style: TextStyle(fontSize: 15),
+                  ),
+                  Spacer(),
+                  Icon(Icons.arrow_right_outlined),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
                   MaterialPageRoute(
                       builder: (context) => const EditProfilePage()),
                 );
@@ -134,7 +161,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 backgroundColor: Colors.white,
                 padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                 elevation: 0,
               ),
               child: const Row(
@@ -144,10 +171,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   SizedBox(width: 8),
                   Text(
                     'Edit Profile',
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 15),
                   ),
                   Spacer(),
-                  Icon(Icons.arrow_forward),
+                  Icon(Icons.arrow_right_outlined),
                 ],
               ),
             ),
@@ -156,7 +183,8 @@ class _ProfilePageState extends State<ProfilePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const MyOrderPage()),
+                  MaterialPageRoute(
+                      builder: (context) => const ChangePasswordPage()),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -165,20 +193,20 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 backgroundColor: Colors.white,
                 padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                 elevation: 0,
               ),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.shopping_bag),
+                  Icon(Icons.security),
                   SizedBox(width: 8),
                   Text(
-                    'View Orders',
-                    style: TextStyle(fontSize: 18),
+                    'Change Password',
+                    style: TextStyle(fontSize: 15),
                   ),
                   Spacer(),
-                  Icon(Icons.arrow_forward),
+                  Icon(Icons.arrow_right_outlined),
                 ],
               ),
             ),
@@ -193,7 +221,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 backgroundColor: Colors.white,
                 padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                 elevation: 0,
               ),
               child: const Row(
@@ -203,10 +231,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   SizedBox(width: 8),
                   Text(
                     'Logout',
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 15),
                   ),
-                  Spacer(), // Push the arrow to the right
-                  Icon(Icons.arrow_forward),
+                  Spacer(),
+                  Icon(Icons.arrow_right_outlined),
                 ],
               ),
             ),
