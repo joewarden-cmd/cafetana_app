@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_food_ordering/pages/home/product_view.dart';
 import 'package:flutter_food_ordering/services/product.dart';
 
 class FilterList extends StatefulWidget {
@@ -125,37 +126,48 @@ class _MyFilterState extends State<FilterList> {
               String priceText = data['price'];
               String imageUrl = data['imageUrl'];
 
-              return Card(
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                      ),
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProductView(productId: docID),
                     ),
-                    ListTile(
-                      title: Text(
-                        productText,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                      subtitle: Text(
-                        "₱$priceText",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.lightGreen,
+                  );
+                },
+                child: Card(
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
                         ),
                       ),
-                      trailing: IconButton(
-                        onPressed: () {
-                          addToCart(context, productText, priceText, imageUrl);
-                        },
-                        icon: const Icon(Icons.shopping_cart,
-                            color: Colors.lightGreen),
+                      ListTile(
+                        title: Text(
+                          productText,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                        subtitle: Text(
+                          "₱$priceText",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.lightGreen,
+                          ),
+                        ),
+                        trailing: IconButton(
+                          onPressed: () {
+                            addToCart(
+                                context, productText, priceText, imageUrl);
+                          },
+                          icon: const Icon(Icons.shopping_cart,
+                              color: Colors.lightGreen),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             },

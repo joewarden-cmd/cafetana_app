@@ -1,23 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_food_ordering/services/product.dart';
 
 class ProductView extends StatefulWidget {
-  final String category;
+  final String productId;
 
-  const ProductView({super.key, required this.category});
+  const ProductView({super.key, required this.productId});
 
   @override
   State<ProductView> createState() => _ProductViewState();
 }
 
 class _ProductViewState extends State<ProductView> {
-  final FilterService foodService = FilterService();
   final user = FirebaseAuth.instance.currentUser!;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  String get category => widget.category;
+  String get productId => widget.productId;
 
   void addToCart(BuildContext context, String productName, String priceText,
       String imageUrl) async {
@@ -90,9 +88,9 @@ class _ProductViewState extends State<ProductView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(category)),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: foodService.getFoodStream(category: category),
+      appBar: AppBar(),
+      body: FutureBuilder<DocumentSnapshot>(
+        future: firestore.collection('product2').doc(productId).get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -102,63 +100,112 @@ class _ProductViewState extends State<ProductView> {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
 
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text("No products found"));
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            return const Center(child: Text("Product not found"));
           }
 
-          List productList = snapshot.data!.docs;
+          var productData = snapshot.data!.data() as Map<String, dynamic>;
 
-          return GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 8.0,
-              mainAxisSpacing: 8.0,
-            ),
-            itemCount: productList.length,
-            itemBuilder: (context, index) {
-              DocumentSnapshot document = productList[index];
-              String docID = document.id;
+          String productName = productData['productName'];
+          String priceText = productData['price'];
+          String imageUrl = productData['imageUrl'];
+          String description =
+              productData['productDescription'] ?? 'No description available';
+          String category = productData['category'] ?? 'Uncategorized';
 
-              Map<String, dynamic> data =
-              document.data() as Map<String, dynamic>;
-              String productText = data['productName'];
-              String priceText = data['price'];
-              String imageUrl = data['imageUrl'];
-
-              return Card(
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                      ),
+          return SingleChildScrollView(
+            child: Padding(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(15.0),
+                    child: Image.network(
+                      imageUrl,
+                      width: double.infinity,
+                      height: 300,
+                      fit: BoxFit.cover,
                     ),
-                    ListTile(
-                      title: Text(
-                        productText,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                      subtitle: Text(
-                        "₱$priceText",
-                        style: const TextStyle(
+                  ),
+                  SizedBox(height: 16.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        productName,
+                        style: TextStyle(
+                          fontSize: 24.0,
                           fontWeight: FontWeight.bold,
-                          color: Colors.lightGreen,
                         ),
                       ),
-                      trailing: IconButton(
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 4.0),
+                        decoration: BoxDecoration(
+                          color: Colors.lightGreenAccent,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: Text(
+                          category,
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.0),
+                  Text(
+                    "₱$priceText",
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.lightGreen,
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  SizedBox(height: 24.0),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.lightGreen,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
                         onPressed: () {
-                          addToCart(context, productText, priceText, imageUrl);
+                          addToCart(context, productName, priceText, imageUrl);
                         },
-                        icon: const Icon(Icons.shopping_cart,
-                            color: Colors.lightGreen),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.shopping_cart, size: 24, color: Colors.white,),
+                            SizedBox(width: 8),
+                            Text("Add to Cart"),
+                          ],
+                        ),
                       ),
                     ),
-                  ],
-                ),
-              );
-            },
+                  )
+                ],
+              ),
+            ),
           );
         },
       ),

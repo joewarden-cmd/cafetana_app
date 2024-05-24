@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_food_ordering/pages/home/filter_list.dart';
+import 'package:flutter_food_ordering/pages/home/product_view.dart';
 import '../../services/category.dart';
 import '../../services/product.dart';
 import '../../widgets/carousel.dart';
@@ -182,6 +183,7 @@ class HomePage extends StatelessWidget {
                       itemCount: productList.length,
                       itemBuilder: (context, index) {
                         DocumentSnapshot document = productList[index];
+                        String docID = document.id;
 
                         Map<String, dynamic> data =
                         document.data() as Map<String, dynamic>;
@@ -189,45 +191,56 @@ class HomePage extends StatelessWidget {
                         String priceText = data['price'];
                         String imageUrl = data['imageUrl'];
 
-                        return Card(
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.network(
-                                    imageUrl,
-                                    fit: BoxFit.cover,
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ProductView(productId: docID),
+                              ),
+                            );
+                          },
+                          child: Card(
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      imageUrl,
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              ListTile(
-                                title: Text(
-                                  productText,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                                subtitle: Text(
-                                  "₱$priceText",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.lightGreen,
+                                ListTile(
+                                  title: Text(
+                                    productText,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                  subtitle: Text(
+                                    "₱$priceText",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.lightGreen,
+                                    ),
+                                  ),
+                                  trailing: IconButton(
+                                    onPressed: () {
+                                      addToCart(context, productText, priceText,
+                                          imageUrl);
+                                    },
+                                    icon: const Icon(Icons.shopping_cart,
+                                        color: Colors.lightGreen),
                                   ),
                                 ),
-                                trailing: IconButton(
-                                  onPressed: () {
-                                    addToCart(context, productText, priceText,
-                                        imageUrl);
-                                  },
-                                  icon: const Icon(Icons.shopping_cart,
-                                      color: Colors.lightGreen),
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         );
                       },
