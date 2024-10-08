@@ -51,7 +51,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
 
     try {
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('info')
+          .doc('data')
+          .update({
         'name': nameController.text,
         'phone': phoneNumberController.text,
         'location': locationController.text,
