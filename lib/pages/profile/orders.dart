@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../services/cart.dart';
+
 class MyOrderPage extends StatefulWidget {
   const MyOrderPage({Key? key}) : super(key: key);
 
@@ -11,6 +13,7 @@ class MyOrderPage extends StatefulWidget {
 
 class _MyOrderPageState extends State<MyOrderPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final CartService cartService = CartService();
   late final String userId;
 
   @override
@@ -19,34 +22,80 @@ class _MyOrderPageState extends State<MyOrderPage> {
     userId = FirebaseAuth.instance.currentUser!.uid;
   }
 
-  void _showProductDetails(BuildContext context, String productId) {
+  void _showProductDetails(
+      BuildContext context, Map<String, dynamic> itemData) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        DateTime transactionDate =
+            (itemData['transactionTimestamp'] as Timestamp).toDate().toLocal();
         return AlertDialog(
-          title: const Text("Product Details"),
-          content: FutureBuilder<DocumentSnapshot>(
-            future: _firestore.collection("products").doc(productId).get(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                return const Text("Error fetching product details");
-              } else if (!snapshot.hasData || !snapshot.data!.exists) {
-                return const Text("Product not found");
-              } else {
-                var product = snapshot.data!;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text("Name: ${product['name']}"),
-                    Text("Price: \$${product['price']}"),
-                    Text("Description: ${product['description']}"),
-                  ],
-                );
-              }
-            },
+          title: const Text("Order Details"),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Order Status: ${itemData['status']}",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text("Order Date: $transactionDate"),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "Items:",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: itemData['itemData'].length,
+                    itemBuilder: (context, index) {
+                      var item = itemData['itemData'][index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        elevation: 3,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              item['image'] != null
+                                  ? Image.network(
+                                      item['image'],
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : const Icon(Icons.image_not_supported,
+                                      size: 80),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Product Name: ${item['name']}",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text("Price: \$${item['price']}"),
+                                    Text("Quantity: ${item['quantity']}"),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
           ),
           actions: [
             TextButton(
@@ -66,28 +115,31 @@ class _MyOrderPageState extends State<MyOrderPage> {
         title: const Text("My Orders"),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: _firestore
-            .collection("orders")
-        // .where("userId", isEqualTo: userId) // Uncomment if user-specific data is needed
-            .orderBy("deleteTimestamp", descending: true)
-            .snapshots(),
+        stream: cartService.getOrderStream(userId),
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            print("Error: ${snapshot.error}");
+            return const Center(child: Text("Something went wrong"));
+          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text("Your cart is empty"));
+          } else {
             List orderList = snapshot.data!.docs;
 
             return ListView.builder(
               itemCount: orderList.length,
               itemBuilder: (context, index) {
                 DocumentSnapshot document = orderList[index];
-                // String productId = document['productId'];
-                String productId = "order123";
-                Timestamp deleteTimestamp = document['deleteTimestamp'];
+                String orderId = document.id;
+                var itemData = document.data() as Map<String, dynamic>;
+
+                Timestamp deleteTimestamp = document['transactionTimestamp'];
 
                 DateTime dateTime = deleteTimestamp.toDate();
                 String formattedTimestamp = "${dateTime.toLocal()}";
 
-                // String orderStatus = document['status'] ?? 'Pending';
-                String orderStatus = 'Pending';
+                String orderStatus = document['status'] ?? 'Pending';
                 return Card(
                   margin: const EdgeInsets.all(8.0),
                   elevation: 5,
@@ -100,9 +152,9 @@ class _MyOrderPageState extends State<MyOrderPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Tracking Number: $productId",
+                              "Tracking Number: $orderId",
                               style:
-                              const TextStyle(fontWeight: FontWeight.bold),
+                                  const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(
@@ -123,7 +175,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
                         const SizedBox(height: 12),
                         ElevatedButton(
                           onPressed: () =>
-                              _showProductDetails(context, productId),
+                              _showProductDetails(context, itemData),
                           child: const Text("View Product Details"),
                         ),
                       ],
@@ -132,8 +184,6 @@ class _MyOrderPageState extends State<MyOrderPage> {
                 );
               },
             );
-          } else {
-            return const Center(child: Text("No ordered items"));
           }
         },
       ),
