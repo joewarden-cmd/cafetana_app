@@ -56,25 +56,43 @@ class _LoginPageState extends State<LoginPage> {
                   end: Alignment.bottomRight,
                 ),
               ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Main text
+                    Text(
+                      "Welcome Back",
+                      style: TextStyle(
+                        fontSize: 34,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    // Subtext
+                    Text(
+                      "Enter your credentials to login.",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
           Expanded(
-            flex: 3,
+            flex: 2,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Center(
+
                 child: SingleChildScrollView(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      // const Text(
-                      //   "Login",
-                      //   style: TextStyle(
-                      //     fontSize: 20,
-                      //     fontWeight: FontWeight.bold,
-                      //   ),
-                      // ),
-                      // const SizedBox(height: 50),
+                      const SizedBox(height: 50),
                       TextField(
                         controller: emailController,
                         keyboardType: TextInputType.emailAddress,
@@ -83,6 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
+                          prefixIcon: Icon(Icons.person),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -94,6 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
+                          prefixIcon: Icon(Icons.lock),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -109,16 +129,28 @@ class _LoginPageState extends State<LoginPage> {
                           child: const Text("Login"),
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      GestureDetector(
-                        onTap: widget.onTap,
-                        child: const Text("Signup"),
+                      const SizedBox(height: 40),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Don't have an account? "),
+                          GestureDetector(
+                            onTap: widget.onTap,
+                            child: const Text(
+                              "Signup",
+                              style: TextStyle(
+                                color: Colors.lightGreen,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
               ),
-            ),
+
           ),
         ],
       ),
