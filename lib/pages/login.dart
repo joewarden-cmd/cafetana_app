@@ -72,7 +72,7 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 10),
                     // Subtext
                     Text(
-                      "Enter your credentials to login.",
+                      "Enter your credentials to login",
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white70,
@@ -101,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          prefixIcon: Icon(Icons.person),
+                          prefixIcon: Icon(Icons.email),
                         ),
                       ),
                       const SizedBox(height: 20),
