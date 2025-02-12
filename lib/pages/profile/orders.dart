@@ -123,7 +123,28 @@ class _MyOrderPageState extends State<MyOrderPage> {
             print("Error: ${snapshot.error}");
             return const Center(child: Text("Something went wrong"));
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text("Your cart is empty"));
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.shopping_cart_outlined,
+                    size: 60,
+                    color: Colors.lightGreen,
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    "You don't have any orders",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            );
           } else {
             List orderList = snapshot.data!.docs;
 
