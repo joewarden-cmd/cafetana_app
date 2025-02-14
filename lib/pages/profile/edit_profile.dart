@@ -97,10 +97,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 TextField(
                   controller: nameController,
                   decoration: InputDecoration(
-                    labelText: "Fullname",
+                    labelText: "FullName",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
+                    prefixIcon: Icon(Icons.person),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -112,6 +113,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
+                    prefixIcon: Icon(Icons.phone),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -122,6 +124,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
+                    prefixIcon: Icon(Icons.location_on),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -134,6 +137,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
+                    prefixIcon: Icon(Icons.email),
                   ),
                 ),
                 const SizedBox(height: 20),

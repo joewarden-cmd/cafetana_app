@@ -75,6 +75,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
+                    prefixIcon: Icon(Icons.lock),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -86,6 +87,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
+                    prefixIcon: Icon(Icons.lock),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -97,6 +99,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
+                    prefixIcon: Icon(Icons.lock),
                   ),
                 ),
                 const SizedBox(height: 20),
