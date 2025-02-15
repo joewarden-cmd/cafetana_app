@@ -78,7 +78,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "Product Name: ${item['name']}",
+                                      "Product Name: ${item['product']}",
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
@@ -174,8 +174,9 @@ class _MyOrderPageState extends State<MyOrderPage> {
                           children: [
                             Text(
                               "Tracking Number: $orderId",
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(
@@ -195,6 +196,10 @@ class _MyOrderPageState extends State<MyOrderPage> {
                         Text("Ordered Date: $formattedTimestamp"),
                         const SizedBox(height: 12),
                         ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.lightGreen,
+                          ),
                           onPressed: () =>
                               _showProductDetails(context, itemData),
                           child: const Text("View Product Details"),

@@ -108,7 +108,7 @@ class HomePage extends StatelessWidget {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   }
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text('No products found'));
+                    return ImageCarousel(imageUrls: ['https://raw.githubusercontent.com/curiouslumber/Ecostora/main/images/Categories/apples.jpg'],);
                   }
                   return ImageCarousel(imageUrls: snapshot.data!);
                 },
@@ -246,7 +246,28 @@ class HomePage extends StatelessWidget {
                       },
                     );
                   } else {
-                    return const Center(child: Text("No data"));
+                    return const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.cloud_off,
+                            size: 60,
+                            color: Colors.lightGreen,
+                          ),
+                          SizedBox(height: 20),
+                          Text(
+                            "No products found",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
                   }
                 },
               ),
