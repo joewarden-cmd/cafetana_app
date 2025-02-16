@@ -1,2 +1,2 @@
-# flutter_food_ordering
-I will have order
+# cafetana_app
+A food ordering app
