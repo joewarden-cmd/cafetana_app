@@ -152,7 +152,29 @@ class _CartPageState extends State<CartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Cart")),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(56.0),
+        child: AppBar(
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.lightGreen, Colors.green],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+          title: const Text(
+            'Cart',
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          iconTheme: IconThemeData(
+            color: Colors.white,
+          ),
+        ),
+      ),
       body: Column(
         children: [
           Expanded(

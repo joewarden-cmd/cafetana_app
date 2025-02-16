@@ -21,7 +21,7 @@ class HomePage extends StatelessWidget {
   void addToCart(BuildContext context, String productName, String priceText,
       String imageUrl) async {
     var userDocRef =
-    FirebaseFirestore.instance.collection('users').doc(user.uid);
+        FirebaseFirestore.instance.collection('users').doc(user.uid);
 
     try {
       var cartSnapshot = await userDocRef
@@ -89,8 +89,28 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(56.0),
+        child: AppBar(
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.lightGreen, Colors.green],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+          title: const Text(
+            'Home',
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          iconTheme: IconThemeData(
+            color: Colors.white,
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -108,7 +128,11 @@ class HomePage extends StatelessWidget {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   }
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return ImageCarousel(imageUrls: ['https://raw.githubusercontent.com/curiouslumber/Ecostora/main/images/Categories/apples.jpg'],);
+                    return ImageCarousel(
+                      imageUrls: [
+                        'https://raw.githubusercontent.com/curiouslumber/Ecostora/main/images/Categories/apples.jpg'
+                      ],
+                    );
                   }
                   return ImageCarousel(imageUrls: snapshot.data!);
                 },
@@ -175,7 +199,7 @@ class HomePage extends StatelessWidget {
                     return GridView.builder(
                       shrinkWrap: true,
                       gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 8.0,
                         mainAxisSpacing: 8.0,
@@ -186,7 +210,7 @@ class HomePage extends StatelessWidget {
                         String docID = document.id;
 
                         Map<String, dynamic> data =
-                        document.data() as Map<String, dynamic>;
+                            document.data() as Map<String, dynamic>;
                         String productText = data['productName'];
                         String priceText = data['price'];
                         String imageUrl = data['imageUrl'];

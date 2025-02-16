@@ -23,7 +23,7 @@ class _MyFilterState extends State<FilterList> {
   void addToCart(BuildContext context, String productName, String priceText,
       String imageUrl) async {
     var userDocRef =
-    FirebaseFirestore.instance.collection('users').doc(user.uid);
+        FirebaseFirestore.instance.collection('users').doc(user.uid);
 
     try {
       var cartSnapshot = await userDocRef
@@ -91,88 +91,113 @@ class _MyFilterState extends State<FilterList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(category)),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: foodService.getFoodStream(category: category),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text("No products found"));
-          }
-
-          List productList = snapshot.data!.docs;
-
-          return GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 8.0,
-              mainAxisSpacing: 8.0,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(56.0),
+        child: AppBar(
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.lightGreen, Colors.green],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
-            itemCount: productList.length,
-            itemBuilder: (context, index) {
-              DocumentSnapshot document = productList[index];
-              String docID = document.id;
+          ),
+          title: Text(
+            category,
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          iconTheme: IconThemeData(
+            color: Colors.white,
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: StreamBuilder<QuerySnapshot>(
+          stream: foodService.getFoodStream(category: category),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-              Map<String, dynamic> data =
-              document.data() as Map<String, dynamic>;
-              String productText = data['productName'];
-              String priceText = data['price'];
-              String imageUrl = data['imageUrl'];
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
 
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProductView(productId: docID),
-                    ),
-                  );
-                },
-                child: Card(
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: Image.network(
-                          imageUrl,
-                          fit: BoxFit.cover,
-                        ),
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return const Center(child: Text("No products found"));
+            }
+
+            List productList = snapshot.data!.docs;
+
+            return GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 8.0,
+                mainAxisSpacing: 8.0,
+              ),
+              itemCount: productList.length,
+              itemBuilder: (context, index) {
+                DocumentSnapshot document = productList[index];
+                String docID = document.id;
+
+                Map<String, dynamic> data =
+                    document.data() as Map<String, dynamic>;
+                String productText = data['productName'];
+                String priceText = data['price'];
+                String imageUrl = data['imageUrl'];
+
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProductView(productId: docID),
                       ),
-                      ListTile(
-                        title: Text(
-                          productText,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                        subtitle: Text(
-                          "₱$priceText",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.lightGreen,
+                    );
+                  },
+                  child: Card(
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Image.network(
+                            imageUrl,
+                            fit: BoxFit.cover,
                           ),
                         ),
-                        trailing: IconButton(
-                          onPressed: () {
-                            addToCart(
-                                context, productText, priceText, imageUrl);
-                          },
-                          icon: const Icon(Icons.shopping_cart,
-                              color: Colors.lightGreen),
+                        ListTile(
+                          title: Text(
+                            productText,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          subtitle: Text(
+                            "₱$priceText",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.lightGreen,
+                            ),
+                          ),
+                          trailing: IconButton(
+                            onPressed: () {
+                              addToCart(
+                                  context, productText, priceText, imageUrl);
+                            },
+                            icon: const Icon(Icons.shopping_cart,
+                                color: Colors.lightGreen),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
-          );
-        },
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
