@@ -94,6 +94,7 @@ class _CartPageState extends State<CartPage> {
     Map<String, dynamic> result = await calculateTotal();
     double totalPrice = result['total'];
     Map<String, int> productCounts = result['productCounts'];
+    String? selectedPaymentMethod = 'Credit Card';
 
     String productListString = "";
     productCounts.forEach((product, count) {
@@ -102,49 +103,105 @@ class _CartPageState extends State<CartPage> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Products in your cart."),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(productListString),
-            Divider(),
-            Text(
-              "Total Price: ₱${totalPrice.toStringAsFixed(2)}",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.lightGreen,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Text("Products in your cart."),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(productListString),
+                  DropdownButton<String>(
+                    value: selectedPaymentMethod,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedPaymentMethod = newValue;
+                      });
+                    },
+                    hint: Text(
+                      'Select Payment Method',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                    items: <String>[
+                      'Credit Card',
+                      'GCash',
+                      'Maya',
+                      'PayPal',
+                      'Cash on Delivery'
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8.0, horizontal: 12.0),
+                          child: Text(
+                            value,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    icon: Icon(
+                      Icons.payment,
+                      color: Colors.lightGreen,
+                    ),
+                    iconSize: 24,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                    ),
+                    dropdownColor: Colors.white,
+                    isExpanded: true,
+                    underline: Container(
+                      height: 2,
+                      color: Colors.lightGreen,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    "Total Price: ₱${totalPrice.toStringAsFixed(2)}",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.lightGreen,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                cartService.clearCart(userId);
+            actions: [
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    cartService.clearCart(userId, selectedPaymentMethod);
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      "Order has been placed..",
-                      style: TextStyle(color: Colors.white, fontSize: 16.0),
-                    ),
-                    backgroundColor: Colors.green,
-                    duration: Duration(seconds: 3),
-                    behavior: SnackBarBehavior.floating,
-                    margin: EdgeInsets.only(bottom: 80.0),
-                  ),
-                );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          "Order has been placed using $selectedPaymentMethod.",
+                          style: TextStyle(color: Colors.white, fontSize: 16.0),
+                        ),
+                        backgroundColor: Colors.green,
+                        duration: Duration(seconds: 3),
+                        behavior: SnackBarBehavior.floating,
+                        margin: EdgeInsets.only(bottom: 80.0),
+                      ),
+                    );
 
-                Navigator.of(context).pop();
-              },
-              child: const Text("Confirm Order"),
-            ),
-          ),
-        ],
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("Confirm Order"),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -217,7 +274,7 @@ class _CartPageState extends State<CartPage> {
                       String docID = document.id;
 
                       Map<String, dynamic> data =
-                      document.data() as Map<String, dynamic>;
+                          document.data() as Map<String, dynamic>;
                       String productText = data['product'];
                       String priceText = data['price'];
                       String productImg = data['image'];

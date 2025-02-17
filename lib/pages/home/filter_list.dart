@@ -128,7 +128,28 @@ class _MyFilterState extends State<FilterList> {
             }
 
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return const Center(child: Text("No products found"));
+              return const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.shopping_basket_outlined,
+                      size: 60,
+                      color: Colors.lightGreen,
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      "No products found",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              );
             }
 
             List productList = snapshot.data!.docs;

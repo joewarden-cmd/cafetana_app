@@ -24,7 +24,7 @@ class CartService {
     return orderStream;
   }
 
-  Future<void> clearCart(String userId) async {
+  Future<void> clearCart(String userId, String? selectedPaymentMethod) async {
     final cartReference = products.doc(userId).collection("cart");
     final orderReference = FirebaseFirestore.instance.collection("orders");
     final userData = await FirebaseFirestore.instance
@@ -49,13 +49,18 @@ class CartService {
       await cartReference.doc(doc.id).delete();
     }
     String customerName = userData['name'] ?? 'Unknown';
+    String address = userData['location'] ?? 'Unknown';
+    String phoneNumber = userData['phoneNumber'] ?? 'Unknown';
 
     await orderReference.add({
       'userId': userId,
       'customer': customerName,
+      'address': address,
+      'phoneNumber': phoneNumber,
       'total': total,
       'itemData': cartItems,
       'transactionTimestamp': FieldValue.serverTimestamp(),
+      'method': selectedPaymentMethod,
       'status': 'Pending',
     });
   }

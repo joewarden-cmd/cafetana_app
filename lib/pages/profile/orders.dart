@@ -98,9 +98,22 @@ class _MyOrderPageState extends State<MyOrderPage> {
             ),
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Close"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Total Price: \$${itemData['total']}",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.lightGreen,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("Close"),
+                ),
+              ],
             ),
           ],
         );
@@ -181,6 +194,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
                 String formattedTimestamp = "${dateTime.toLocal()}";
 
                 String orderStatus = document['status'] ?? 'Pending';
+                String orderMethod = document['method'] ?? 'None';
                 return Card(
                   margin: const EdgeInsets.all(8.0),
                   elevation: 5,
@@ -212,17 +226,38 @@ class _MyOrderPageState extends State<MyOrderPage> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 15),
                         Text("Ordered Date: $formattedTimestamp"),
-                        const SizedBox(height: 12),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.lightGreen,
-                          ),
-                          onPressed: () =>
-                              _showProductDetails(context, itemData),
-                          child: const Text("View Product Details"),
+                        const SizedBox(height: 15),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: Colors.lightGreen,
+                              ),
+                              onPressed: () =>
+                                  _showProductDetails(context, itemData),
+                              child: const Text("View Product Details"),
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.payment,
+                                  color: Colors.lightGreen,
+                                ),
+                                SizedBox(width: 8.0),
+                                Text(
+                                  orderMethod,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.lightGreen),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ],
                     ),
