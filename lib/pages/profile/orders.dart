@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 import '../../services/cart.dart';
 
@@ -29,6 +30,8 @@ class _MyOrderPageState extends State<MyOrderPage> {
       builder: (BuildContext context) {
         DateTime transactionDate =
             (itemData['transactionTimestamp'] as Timestamp).toDate().toLocal();
+        String formattedDate =
+            DateFormat('MMM dd, yyyy h:mma').format(transactionDate);
         return AlertDialog(
           title: const Text("Order Details"),
           content: SizedBox(
@@ -42,7 +45,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  Text("Order Date: $transactionDate"),
+                  Text("Order Date: $formattedDate"),
                   const SizedBox(height: 16),
                   const Text(
                     "Items:",
@@ -191,7 +194,9 @@ class _MyOrderPageState extends State<MyOrderPage> {
                 Timestamp deleteTimestamp = document['transactionTimestamp'];
 
                 DateTime dateTime = deleteTimestamp.toDate();
-                String formattedTimestamp = "${dateTime.toLocal()}";
+                String formattedDate =
+                    DateFormat('MMM dd, yyyy h:mma').format(dateTime);
+                // String formattedTimestamp = "${dateTime.toLocal()}";
 
                 String orderStatus = document['status'] ?? 'Pending';
                 String orderMethod = document['method'] ?? 'None';
@@ -227,7 +232,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
                           ],
                         ),
                         const SizedBox(height: 15),
-                        Text("Ordered Date: $formattedTimestamp"),
+                        Text("Ordered Date: $formattedDate"),
                         const SizedBox(height: 15),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,

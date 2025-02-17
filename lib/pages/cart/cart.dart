@@ -181,6 +181,8 @@ class _CartPageState extends State<CartPage> {
                   onPressed: () {
                     cartService.clearCart(userId, selectedPaymentMethod);
 
+                    Navigator.of(context).pop();
+
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
@@ -193,8 +195,6 @@ class _CartPageState extends State<CartPage> {
                         margin: EdgeInsets.only(bottom: 80.0),
                       ),
                     );
-
-                    Navigator.of(context).pop();
                   },
                   child: const Text("Confirm Order"),
                 ),
