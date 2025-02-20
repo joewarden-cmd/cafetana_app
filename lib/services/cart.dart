@@ -24,7 +24,7 @@ class CartService {
     return orderStream;
   }
 
-  Future<void> clearCart(String userId, String? selectedPaymentMethod) async {
+  Future<void> clearCart(String userId, String? selectedPaymentMethod, double? totalPrice) async {
     final cartReference = products.doc(userId).collection("cart");
     final orderReference = FirebaseFirestore.instance.collection("orders");
     final userData = await FirebaseFirestore.instance
@@ -37,14 +37,14 @@ class CartService {
     final QuerySnapshot cartSnapshot = await cartReference.get();
 
     List<Map<String, dynamic>> cartItems = [];
-    double total = 0.0;
+    // double total = 0.0;
 
     for (QueryDocumentSnapshot doc in cartSnapshot.docs) {
       Map<String, dynamic> itemData = doc.data() as Map<String, dynamic>;
       cartItems.add(itemData);
 
-      double price = double.tryParse(itemData['price']) ?? 0.0;
-      total += price;
+      // double price = double.tryParse(itemData['price']) ?? 0.0;
+      // total += price;
 
       await cartReference.doc(doc.id).delete();
     }
@@ -57,7 +57,7 @@ class CartService {
       'customer': customerName,
       'address': address,
       'phoneNumber': phoneNumber,
-      'total': total,
+      'total': totalPrice,
       'itemData': cartItems,
       'transactionTimestamp': FieldValue.serverTimestamp(),
       'method': selectedPaymentMethod,

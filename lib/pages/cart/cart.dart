@@ -179,7 +179,7 @@ class _CartPageState extends State<CartPage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    cartService.clearCart(userId, selectedPaymentMethod);
+                    cartService.clearCart(userId, selectedPaymentMethod, totalPrice);
 
                     Navigator.of(context).pop();
 
