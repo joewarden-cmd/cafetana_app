@@ -85,7 +85,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    Text("Price: \$${item['price']}"),
+                                    Text("Price: ₱${item['price']}"),
                                     Text("Quantity: ${item['quantity']}"),
                                   ],
                                 ),
@@ -105,7 +105,7 @@ class _MyOrderPageState extends State<MyOrderPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Total Price: \$${itemData['total']}",
+                  "Total Price: ₱${itemData['total']}",
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
