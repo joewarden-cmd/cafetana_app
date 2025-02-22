@@ -4,11 +4,11 @@ class AllProductService {
   final CollectionReference allProducts =
   FirebaseFirestore.instance.collection("product2");
 
-  Stream<List<DocumentSnapshot>> getAllProductStream() async* {
-    QuerySnapshot snapshot = await allProducts.get();
-    List<DocumentSnapshot> shuffledProducts = List.from(snapshot.docs)..shuffle();
-
-    yield shuffledProducts.take(10).toList();
+  Stream<List<DocumentSnapshot>> getAllProductStream() {
+    return allProducts.where('status', isEqualTo: "Published").snapshots().map((snapshot) {
+      List<DocumentSnapshot> shuffledProducts = List.from(snapshot.docs)..shuffle();
+      return shuffledProducts.toList();
+    });
   }
 }
 
@@ -40,6 +40,7 @@ class FilterService {
     return firestore
         .collection('product2') // Assuming your collection is named 'products'
         .where('category', isEqualTo: category) // Filter by category
+        .where('status', isEqualTo: "Published")
         .snapshots();
   }
 }
